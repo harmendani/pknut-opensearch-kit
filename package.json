@@ -1,0 +1,53 @@
+{
+  "name": "pkgo-opensearch",
+  "version": "0.1.0",
+  "description": "A small JS library for OpenSearch to build queries and connection faster",
+  "main": "src/index.js",
+  "publishConfig": {
+    "registry": ""
+  },
+  "files": [
+    "src",
+    "tests",
+    "package.json",
+    "README.md"
+  ],
+  "scope": "",
+  "scripts": {
+    "prepare": "husky install",
+    "pretest": "npm run check && npm run lint",
+    "test": "npm run base:test",
+    "base:test": "jest --silent --runInBand --config jest.config.js",
+    "check": "depcheck --ignores husky,jest",
+    "lint": "standard",
+    "lint:fix": "npm run lint -- --fix",
+    "lint:staged": "lint-staged",
+    "test:staged": "npm run base:test -- --findRelatedTests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git"
+  },
+  "license": "ISC",
+  "homepage": "",
+  "devDependencies": {
+    "depcheck": "^1.4.3",
+    "husky": "^8.0.3",
+    "jest": "^29",
+    "lint-staged": "^13.3.0",
+    "standard": "^17.0.0"
+  },
+  "standard": {
+    "env": [
+      "jest",
+      "node"
+    ]
+  },
+  "engines": {
+    "node": "16 || 18"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "~7.10.0",
+    "nltk-stopwords": "^1.0.3"
+  }
+}
