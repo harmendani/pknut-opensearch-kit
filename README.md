@@ -1,4 +1,4 @@
-# Pkgo-OpenSearch
+# pkNUT-OpenSearch-Kit
 
 ![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)
 ![NodeJS](https://img.shields.io/badge/NodeJS-16+-blue.svg)
@@ -18,7 +18,7 @@ This library provides an easy-to-use interface for querying data from an OpenSea
 To set up the app we config 'cli:login' on your pkg and then, run:
 
 ```
-npm install @scope/pkgo-opensearch
+npm install @scope/pknut-opensearch-Kit
 ```
 
 ### 🛠 Building and Executing a Query  

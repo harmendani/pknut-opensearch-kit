@@ -1,7 +1,7 @@
 {
-  "name": "pkgo-opensearch",
+  "name": "pknut-opensearch-kit",
   "version": "0.1.0",
-  "description": "A small JS library for OpenSearch to build queries and connection faster",
+  "description": "A small suite for OpenSearch stack to build queries and connections faster",
   "main": "src/index.js",
   "publishConfig": {
     "registry": ""

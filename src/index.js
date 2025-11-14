@@ -5,6 +5,6 @@
  * The `CommanderFactory` class is used to build and manage complex queries with various clauses and configurations.
  *
  * Usage:
- * const { OpenSearch, CommanderFactory } = require('pkgo-opensearch');
+ * const { OpenSearch, CommanderFactory } = require('pknut-opensearch-kit');
  */
 module.exports = require('./factory')
