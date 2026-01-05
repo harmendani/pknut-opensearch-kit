@@ -11,26 +11,20 @@ This library provides an easy-to-use interface for querying data from an OpenSea
 ### 🍔 Tech Stack  
 
 - [NodeJS 16+](https://nodejs.org/dist/latest-v16.x/docs/api/)
-- [ElasticSearch 7.10.0](https://www.elastic.co/guide/en/elasticsearch/reference/7.10/release-notes-7.10.0.html)
 
 ### 🛠 Installation  
 
-To set up the app we config 'cli:login' on your pkg and then, run:
-
-```
-npm install @scope/pknut-opensearch-Kit
-```
+- Download the project locally
+- Go to the next steps to import the source file
 
 ### 🛠 Building and Executing a Query  
 
 Here's a complete example demonstrating the setup, configuration, and execution of a query:
 
 ```
-// Require Imports
+// Required Imports
 const { OpenSearch, CommanderFactory } = require('./src');
 
-// Optional imports to use builtIn features
-const { builtInQueries: { HashKey, ReleaseYear } } = require('./src/');
  ```
 
  1. Set up the OpenSearch client  
@@ -47,13 +41,8 @@ host: 'http://localhost:9200'
 const commanderFactory = new CommanderFactory({ index: 'my_index' });
  ```
 
- 3. Add built-in or custom queries  
 
- ```
-commanderFactory.addBuiltInQueries(ReleaseYear, values = [2024]);
-```
-
- 4. Configure your query using CommanderFactory  
+ 3. Configure your query using CommanderFactory  
 
 ```
  // Example: Adding filters and a custom query
@@ -61,13 +50,13 @@ commanderFactory.addFilter({ type: 'MOVIE' });
 commanderFactory.addCustom({ query: { bool: { should: [{ match: { licenseStart: '2024-01-01' } }] } } });
 ```
 
- 5. Set additional query properties  
+ 4. Set additional query properties  
 
 ```
 commanderFactory.setTrackScore(true); // Enable score tracking
  ```
 
- 6. Build and execute the query  
+ 5. Build and execute the query  
 
 ```
 const finalQuery = commanderFactory.build();
@@ -143,20 +132,9 @@ const { CommanderFactory } = require('./src');
 const finalQuery = commanderFactory.build();
 ```
 
-### ⚡ Built-In Queries  
+### ⚡ Built-In Queries  (on going)
 
-The library includes several built-in query classes ready for use.  
-These handle common search operations and can be extended or customized.  
-Example Built-In Query: ReleaseYear
-
-```
-const { builtInQueries: {ReleaseYear} } = require('./src');
-
-// Assuming `commanderFactory` is an instance of `CommanderFactory`
-commanderFactory.addBuiltInQueries(ReleaseYear, values = [2023]);
-```
-
-Example Built-In Query: HashKey
+Example Built-In Query: HashKey command
 
 ```
 const { builtInQueries: {HashKey}} = require('./src');
