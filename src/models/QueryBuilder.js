@@ -55,25 +55,30 @@ class QueryBuilder {
 
   setSize (size) {
     this.size = size
+    return this
   }
 
   setFrom (from) {
     this.from = from
+    return this
   }
 
   setIndex (index) {
     this.index = index
+    return this
   }
 
   setTrackScore (isTracked) {
     this.track_scores = isTracked
+    return this
   }
 
   #_buildQuery (query) {
     if (isValidObjectQuery(query)) {
       return query
     } else {
-      return this.query
+      // Return empty object for invalid queries to avoid errors
+      return {}
     }
   }
 

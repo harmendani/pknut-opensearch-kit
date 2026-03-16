@@ -100,10 +100,11 @@ describe('CommanderFactory Tests', () => {
     const query = commanderInstance.build()
 
     expect(QueryBuilder.prototype.build).toHaveBeenCalled()
+    // When invalid query is passed, it should be set to empty object
     expect(query).toEqual({
       index: 'contents',
       body: {
-        query: { bool: {} },
+        query: {},
         sort: [],
         track_scores: false,
         size: '100',

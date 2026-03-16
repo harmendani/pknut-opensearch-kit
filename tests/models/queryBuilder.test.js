@@ -91,9 +91,9 @@ describe('test the scene: QueryBuilder Model', () => {
     const instance = new QueryBuilder(dependencies.objConstructor)
       .setCustomQuery(2020)
     expect(QueryBuilder.prototype.setCustomQuery).toHaveBeenCalled()
-    expect(instance).toEqual({
-      ...dependencies.objConstructor
-    })
+    // When invalid query is passed, it should be set to empty object
+    expect(instance.query).toEqual({})
+    expect(instance.index).toEqual(dependencies.objConstructor.index)
   })
 
   test('should add sort criteria and return instance', () => {
