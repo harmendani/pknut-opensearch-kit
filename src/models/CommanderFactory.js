@@ -16,39 +16,48 @@ class CommanderFactory {
 
   addFilter (clause) {
     this.commands.push(new FilterCommand(clause))
+    return this
   }
 
   addMust (clause) {
     this.commands.push(new MustCommand(clause))
+    return this
   }
 
   addShould (clause) {
     this.commands.push(new ShouldCommand(clause))
+    return this
   }
 
   addSort (clause) {
     this.commands.push(new SortCommand(clause))
+    return this
   }
 
   addCustom (clause) {
-    return this.commands.push(new CustomQueryCommand(clause))
+    this.commands.push(new CustomQueryCommand(clause))
+    return this
   }
 
   // Methods to configure query properties
   setSize (size) {
     this.queryBuilder.setSize(size)
+    return this
   }
 
   setFrom (from) {
     this.queryBuilder.setFrom(from)
+    return this
   }
 
   setIndex (index) {
     this.queryBuilder.setIndex(index)
+    return this
   }
 
   setTrackScore (isTracked) {
     this.queryBuilder.setTrackScore(isTracked)
+    return this
   }
 
   build () {

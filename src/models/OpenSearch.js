@@ -23,8 +23,12 @@ module.exports = ({ OpenSearchService }) => {
  * @returns {Array<Object>} Result for search operation
 */
     async search (params) {
-      const result = await this.#connection.search(params)
-      return result
+      try {
+        const result = await this.#connection.search(params)
+        return result
+      } catch (error) {
+        throw new Error(`OpenSearch search failed: ${error.message}`)
+      }
     }
   }
 }
