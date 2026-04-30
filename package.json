@@ -1,6 +1,6 @@
 {
   "name": "pknut-opensearch-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A small suite for OpenSearch stack to build queries and connections faster",
   "main": "src/index.js",
   "types": "src/index.d.ts",
