@@ -83,7 +83,7 @@ class QueryBuilder {
   }
 
   /**
-   * @summary Build the query T to be used as a params on the OpenSearch service
+   * @summary Build the query T to be used as a params on the OpenSearch service (ES 7.x / OpenSearch 1.x)
    * @example
     Object<T>
     index: <String>,
@@ -106,6 +106,29 @@ class QueryBuilder {
     }
 
     return { index, body }
+  }
+
+  /**
+   * @summary Build the query in flat format for modern clients (ES 8.x+ / OpenSearch 2.x+).
+   *          Unlike `build()`, the query params are placed at the top level — no `body` wrapper.
+   * @example
+    Object<T>
+    index: <String>,
+    query = { bool: Object }
+    sort = <Array>
+    track_scores = <Boolean>
+    size = <String | Number>
+    from = <Number>
+   */
+  buildFlat () {
+    return {
+      index: this.index,
+      query: this.query,
+      track_scores: this.track_scores, // eslint-disable-line
+      sort: this.sort,
+      size: this.size,
+      from: this.from
+    }
   }
 }
 

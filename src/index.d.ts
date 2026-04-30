@@ -5,11 +5,13 @@
 import {
   OpenSearchConfig,
   SearchParams,
+  FlatSearchParams,
   SearchResult,
   CommanderFactoryConfig,
   QueryObject,
   SortCriteria,
-  BuiltInQueryConstructor
+  BuiltInQueryConstructor,
+  CreateClientOptions
 } from './types'
 
 /**
@@ -27,7 +29,7 @@ export class OpenSearch {
    * @param params - Search parameters
    * @returns Promise resolving to search results
    */
-  search(params?: SearchParams): Promise<SearchResult>
+  search(params?: SearchParams | FlatSearchParams): Promise<SearchResult>
 }
 
 /**
@@ -112,10 +114,22 @@ export class CommanderFactory {
   setTrackScore(isTracked: boolean): this
 
   /**
-   * Build and return the final query
+   * Build and return the final query.
+   * The output format is **automatically determined** by the stack configured in `createClient()`:
+   *  - `'opensearch'` / `'elasticsearch-v8'`: flat format `{ index, query, sort, ... }`
+   *
+   * When using `CommanderFactory` from the default export, the format is also flat.
+   * Use `buildFlat()` as an explicit override if needed.
    * @returns The complete query object ready for execution
    */
-  build(): SearchParams
+  build(): FlatSearchParams | SearchParams
+
+  /**
+   * Explicitly build in flat format regardless of configured stack.
+   * Returns `{ index, query, sort, ... }` — no `body` wrapper.
+   * @returns The flat query object ready for execution with a modern client
+   */
+  buildFlat(): FlatSearchParams
 }
 
 /**
@@ -125,10 +139,32 @@ export namespace builtInQueries {
   // Add specific built-in query types here as they are implemented
 }
 
+/**
+ * Returns a factory (`{ OpenSearch, CommanderFactory }`) configured for the specified stack.
+ * Both stacks use flat query params — use `buildFlat()` for queries.
+ *
+ * @param options.stack
+ *   - `'opensearch'` (default) : OpenSearch 2.x+ / 3.x+ — uses @opensearch-project/opensearch
+ *   - `'elasticsearch-v8'`     : Elasticsearch 8.x+      — uses @elastic/elasticsearch v8
+ *
+ * @example
+ * // Modern OpenSearch setup
+ * const { createClient } = require('pknut-opensearch-kit')
+ * const { OpenSearch, CommanderFactory } = createClient({ stack: 'opensearch' })
+ * const client = new OpenSearch({ host: 'http://localhost:9200' })
+ * const query = new CommanderFactory({ index: 'my_index' }).addFilter([...]).buildFlat()
+ * client.search(query)
+ */
+export function createClient(options?: CreateClientOptions): {
+  OpenSearch: typeof OpenSearch
+  CommanderFactory: typeof CommanderFactory
+}
+
 declare const _exports: {
   OpenSearch: typeof OpenSearch
   CommanderFactory: typeof CommanderFactory
   builtInQueries: typeof builtInQueries
+  createClient: typeof createClient
 }
 
 export = _exports

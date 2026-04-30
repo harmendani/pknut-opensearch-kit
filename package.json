@@ -48,7 +48,8 @@
     "node": ">=16"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "~7.10.0",
+    "@elastic/elasticsearch": "^8.19.1",
+    "@opensearch-project/opensearch": "^3.6.0",
     "nltk-stopwords": "^1.0.3"
   }
 }
