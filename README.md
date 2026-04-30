@@ -240,8 +240,8 @@ A QueryBuilder instance is initialized with the following default values:
 
 Q: Do I need to call build after altering query properties?
 
-A: Yes, whenever you make changes using methods like `setSize`, `setTrackScore`, etc., you need to call `build()` (or `buildFlat()` for modern stacks) to update the query with these changes.  
-The build methods construct the query with the updated properties while preserving the rest of the query configuration.  
+A: Yes, whenever you make changes using methods like `setSize`, `setTrackScore`, etc., you need to call `build()` to update the query with these changes.  
+The build method constructs the query with the updated properties while preserving the rest of the query configuration.  
 
 Q: Which build method should I use?
 

@@ -25,7 +25,9 @@ const ElasticSearchV8Dependencies = {
  * @param {'opensearch'|'elasticsearch-v8'} [options.stack='opensearch']
  *   - 'opensearch'       : OpenSearch 2.x+ / 3.x+  — uses @opensearch-project/opensearch
  *   - 'elasticsearch-v8' : Elasticsearch 8.x+       — uses @elastic/elasticsearch v8
- * @returns {{ OpenSearch: Function, CommanderFactory: Function }}
+ * @returns {{ OpenSearch: Function, CommanderFactory: Function }} Factory object with:
+ *   - `OpenSearch`: class for connecting to the search cluster
+ *   - `CommanderFactory`: class for building queries; `build()` automatically produces the correct format for the configured stack
  */
 function createClient ({ stack = 'opensearch' } = {}) {
   if (stack === 'elasticsearch-v8') {
