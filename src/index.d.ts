@@ -5,11 +5,13 @@
 import {
   OpenSearchConfig,
   SearchParams,
+  FlatSearchParams,
   SearchResult,
   CommanderFactoryConfig,
   QueryObject,
   SortCriteria,
-  BuiltInQueryConstructor
+  BuiltInQueryConstructor,
+  CreateClientOptions
 } from './types'
 
 /**
@@ -27,7 +29,7 @@ export class OpenSearch {
    * @param params - Search parameters
    * @returns Promise resolving to search results
    */
-  search(params?: SearchParams): Promise<SearchResult>
+  search(params?: SearchParams | FlatSearchParams): Promise<SearchResult>
 }
 
 /**
@@ -112,10 +114,18 @@ export class CommanderFactory {
   setTrackScore(isTracked: boolean): this
 
   /**
-   * Build and return the final query
-   * @returns The complete query object ready for execution
+   * Build and return the final query in legacy format (ES 7.x / OpenSearch 1.x).
+   * Returns `{ index, body: { query, sort, ... } }`.
+   * @returns The complete query object ready for execution with a legacy client
    */
   build(): SearchParams
+
+  /**
+   * Build and return the final query in flat format for modern clients (ES 8.x+ / OpenSearch 2.x+).
+   * Returns `{ index, query, sort, ... }` without a `body` wrapper.
+   * @returns The complete flat query object ready for execution with a modern client
+   */
+  buildFlat(): FlatSearchParams
 }
 
 /**
@@ -125,10 +135,32 @@ export namespace builtInQueries {
   // Add specific built-in query types here as they are implemented
 }
 
+/**
+ * Returns a factory (`{ OpenSearch, CommanderFactory }`) configured for the specified stack.
+ *
+ * @param options.stack
+ *   - `'legacy'`           : ES 7.x / OpenSearch 1.x — use `build()` for `{ index, body }` format
+ *   - `'opensearch'`       : OpenSearch 2.x+ / 3.x+ — use `buildFlat()` for flat params
+ *   - `'elasticsearch-v8'` : Elasticsearch 8.x+      — use `buildFlat()` for flat params
+ *
+ * @example
+ * // Modern OpenSearch setup
+ * const { createClient } = require('pknut-opensearch-kit')
+ * const { OpenSearch, CommanderFactory } = createClient({ stack: 'opensearch' })
+ * const client = new OpenSearch({ host: 'http://localhost:9200' })
+ * const query = new CommanderFactory({ index: 'my_index' }).addFilter([...]).buildFlat()
+ * client.search(query)
+ */
+export function createClient(options?: CreateClientOptions): {
+  OpenSearch: typeof OpenSearch
+  CommanderFactory: typeof CommanderFactory
+}
+
 declare const _exports: {
   OpenSearch: typeof OpenSearch
   CommanderFactory: typeof CommanderFactory
   builtInQueries: typeof builtInQueries
+  createClient: typeof createClient
 }
 
 export = _exports

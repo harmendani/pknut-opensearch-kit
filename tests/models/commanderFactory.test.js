@@ -144,6 +144,44 @@ describe('CommanderFactory Tests', () => {
     expect(QueryBuilder.prototype.build).toHaveBeenCalled()
   })
 
+  test('buildFlat should return flat params without body wrapper', () => {
+    jest.spyOn(QueryBuilder.prototype, 'buildFlat')
+    const commanderInstance = new CommanderFactory({ index: 'contents' })
+
+    const query = commanderInstance.buildFlat()
+
+    expect(QueryBuilder.prototype.buildFlat).toHaveBeenCalled()
+    expect(query).toEqual({
+      index: 'contents',
+      query: { bool: {} },
+      sort: [],
+      track_scores: false,
+      size: '100',
+      from: 0
+    })
+    expect(query).not.toHaveProperty('body')
+  })
+
+  test('buildFlat should apply commands and return flat format', () => {
+    jest.spyOn(QueryBuilder.prototype, 'buildFlat')
+    const commanderInstance = new CommanderFactory({ index: 'contents' })
+    const filterCommand = new FilterCommand([{ term: 'test' }])
+
+    commanderInstance.commands.push(filterCommand)
+    const query = commanderInstance.buildFlat()
+
+    expect(QueryBuilder.prototype.buildFlat).toHaveBeenCalled()
+    expect(query).toEqual({
+      index: 'contents',
+      query: { bool: { filter: [{ term: 'test' }] } },
+      sort: [],
+      track_scores: false,
+      size: '100',
+      from: 0
+    })
+    expect(query).not.toHaveProperty('body')
+  })
+
   test('should add builtIn queries command', () => {
     class BuiltInQueryMock {
       constructor (values) {

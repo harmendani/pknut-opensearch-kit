@@ -153,4 +153,37 @@ describe('test the scene: QueryBuilder Model', () => {
       body: bodyExpected
     })
   })
+
+  test('buildFlat method should return query params at top level without body wrapper', () => {
+    const instance = new QueryBuilder(dependencies.objConstructor)
+
+    const result = instance.buildFlat()
+
+    expect(result).toEqual({
+      index: dependencies.objConstructor.index,
+      query: { bool: {} },
+      sort: [],
+      track_scores: false,
+      size: '100',
+      from: 0
+    })
+    expect(result).not.toHaveProperty('body')
+  })
+
+  test('buildFlat method reflects added clauses without body wrapper', () => {
+    const instance = new QueryBuilder(dependencies.objConstructor)
+      .addMust(dependencies.clause)
+
+    const result = instance.buildFlat()
+
+    expect(result).toEqual({
+      index: dependencies.objConstructor.index,
+      query: { bool: { must: [dependencies.clause] } },
+      sort: [],
+      track_scores: false,
+      size: '100',
+      from: 0
+    })
+    expect(result).not.toHaveProperty('body')
+  })
 })

@@ -64,6 +64,15 @@ class CommanderFactory {
     this.commands.forEach(command => command.execute(this.queryBuilder))
     return this.queryBuilder.build()
   }
+
+  /**
+   * Build and return the final query in flat format for modern clients (ES 8.x+ / OpenSearch 2.x+).
+   * Unlike `build()`, params are at the top level — no `body` wrapper.
+   */
+  buildFlat () {
+    this.commands.forEach(command => command.execute(this.queryBuilder))
+    return this.queryBuilder.buildFlat()
+  }
   /**
    * Adds a specific built-in query to the list of executors.
    *
