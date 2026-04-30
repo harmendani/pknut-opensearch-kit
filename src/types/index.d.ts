@@ -46,12 +46,12 @@ export interface CommanderFactoryConfig {
 }
 
 /**
- * Stack type determines which client and query format to use.
- * - 'legacy'           : ES 7.x / OpenSearch 1.x — use `build()` for `{ index, body }` format
- * - 'opensearch'       : OpenSearch 2.x+ / 3.x+ — use `buildFlat()` for flat params format
- * - 'elasticsearch-v8' : Elasticsearch 8.x+      — use `buildFlat()` for flat params format
+ * Stack type determines which client to use.
+ * Both modern stacks use flat query params — use `buildFlat()` for queries.
+ * - 'opensearch'       : OpenSearch 2.x+ / 3.x+ — uses @opensearch-project/opensearch
+ * - 'elasticsearch-v8' : Elasticsearch 8.x+      — uses @elastic/elasticsearch v8
  */
-export type StackType = 'legacy' | 'opensearch' | 'elasticsearch-v8'
+export type StackType = 'opensearch' | 'elasticsearch-v8'
 
 export interface OpenSearchConfig {
   host: string

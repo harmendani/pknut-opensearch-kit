@@ -1,35 +1,37 @@
-const { Client: LegacyClient } = require('@elastic/elasticsearch')
-const { Client: ModernClient } = require('@opensearch-project/opensearch')
+const { Client: ElasticSearchV8Client } = require('@elastic/elasticsearch')
+const { Client: OpenSearchClient } = require('@opensearch-project/opensearch')
 const { openSearchDefault } = require('../config')
 const { openSearchService } = require('../services')
 const factory = require('./factory')
 
-// Legacy setup: ES 7.x / OpenSearch 1.x (uses { index, body: {...} } query format)
-const LegacyOpenSearchService = openSearchService({ Client: LegacyClient, openSearchDefault })
-const legacyDependencies = { OpenSearchService: LegacyOpenSearchService }
+// OpenSearch stack: @opensearch-project/opensearch (OS 2.x+ / 3.x+)
+const OpenSearchDependencies = {
+  OpenSearchService: openSearchService({ Client: OpenSearchClient, openSearchDefault })
+}
 
-// Modern setup: ES 8.x+ / OpenSearch 2.x+ (uses flat { index, query, ... } format)
-const ModernOpenSearchService = openSearchService({ Client: ModernClient, openSearchDefault })
-const modernDependencies = { OpenSearchService: ModernOpenSearchService }
+// Elasticsearch v8+ stack: @elastic/elasticsearch (ES 8.x+)
+const ElasticSearchV8Dependencies = {
+  OpenSearchService: openSearchService({ Client: ElasticSearchV8Client, openSearchDefault })
+}
 
 /**
  * Returns a factory configured for the specified stack.
+ * Both stacks use flat query params — use `buildFlat()` instead of `build()`.
  *
  * @param {Object} [options={}]
- * @param {'legacy'|'opensearch'|'elasticsearch-v8'} [options.stack='legacy']
- *   - 'legacy'           : ES 7.x / OpenSearch 1.x — use `build()` for query params
- *   - 'opensearch'       : OpenSearch 2.x+ / 3.x+ — use `buildFlat()` for query params
- *   - 'elasticsearch-v8' : Elasticsearch 8.x+    — use `buildFlat()` for query params
+ * @param {'opensearch'|'elasticsearch-v8'} [options.stack='opensearch']
+ *   - 'opensearch'       : OpenSearch 2.x+ / 3.x+  — uses @opensearch-project/opensearch
+ *   - 'elasticsearch-v8' : Elasticsearch 8.x+       — uses @elastic/elasticsearch v8
  * @returns {{ OpenSearch: Function, CommanderFactory: Function }}
  */
-function createClient ({ stack = 'legacy' } = {}) {
-  if (stack === 'opensearch' || stack === 'elasticsearch-v8') {
-    return factory(modernDependencies)
+function createClient ({ stack = 'opensearch' } = {}) {
+  if (stack === 'elasticsearch-v8') {
+    return factory(ElasticSearchV8Dependencies)
   }
-  return factory(legacyDependencies)
+  return factory(OpenSearchDependencies)
 }
 
 module.exports = {
-  ...factory(legacyDependencies),
+  ...factory(OpenSearchDependencies),
   createClient
 }

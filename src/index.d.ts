@@ -137,11 +137,11 @@ export namespace builtInQueries {
 
 /**
  * Returns a factory (`{ OpenSearch, CommanderFactory }`) configured for the specified stack.
+ * Both stacks use flat query params — use `buildFlat()` for queries.
  *
  * @param options.stack
- *   - `'legacy'`           : ES 7.x / OpenSearch 1.x — use `build()` for `{ index, body }` format
- *   - `'opensearch'`       : OpenSearch 2.x+ / 3.x+ — use `buildFlat()` for flat params
- *   - `'elasticsearch-v8'` : Elasticsearch 8.x+      — use `buildFlat()` for flat params
+ *   - `'opensearch'` (default) : OpenSearch 2.x+ / 3.x+ — uses @opensearch-project/opensearch
+ *   - `'elasticsearch-v8'`     : Elasticsearch 8.x+      — uses @elastic/elasticsearch v8
  *
  * @example
  * // Modern OpenSearch setup
