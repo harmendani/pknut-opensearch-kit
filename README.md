@@ -1,6 +1,6 @@
 # pkNUT-OpenSearch-Kit
 
-![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)
+![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)
 ![NodeJS](https://img.shields.io/badge/NodeJS-16+-blue.svg)
 ![Tests](https://img.shields.io/badge/TestCoverage-100-greenlight.svg)
 
