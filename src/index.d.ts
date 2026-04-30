@@ -114,16 +114,20 @@ export class CommanderFactory {
   setTrackScore(isTracked: boolean): this
 
   /**
-   * Build and return the final query in legacy format (ES 7.x / OpenSearch 1.x).
-   * Returns `{ index, body: { query, sort, ... } }`.
-   * @returns The complete query object ready for execution with a legacy client
+   * Build and return the final query.
+   * The output format is **automatically determined** by the stack configured in `createClient()`:
+   *  - `'opensearch'` / `'elasticsearch-v8'`: flat format `{ index, query, sort, ... }`
+   *
+   * When using `CommanderFactory` from the default export, the format is also flat.
+   * Use `buildFlat()` as an explicit override if needed.
+   * @returns The complete query object ready for execution
    */
-  build(): SearchParams
+  build(): FlatSearchParams | SearchParams
 
   /**
-   * Build and return the final query in flat format for modern clients (ES 8.x+ / OpenSearch 2.x+).
-   * Returns `{ index, query, sort, ... }` without a `body` wrapper.
-   * @returns The complete flat query object ready for execution with a modern client
+   * Explicitly build in flat format regardless of configured stack.
+   * Returns `{ index, query, sort, ... }` — no `body` wrapper.
+   * @returns The flat query object ready for execution with a modern client
    */
   buildFlat(): FlatSearchParams
 }

@@ -1,4 +1,4 @@
-const CommanderFactory = require('../../src/models/CommanderFactory')
+const createCommanderFactory = require('../../src/models/CommanderFactory')
 const QueryBuilder = require('../../src/models/QueryBuilder')
 const {
   MustCommand,
@@ -7,6 +7,9 @@ const {
   SortCommand,
   CustomQueryCommand
 } = require('../../src/models/commands/BaseQueryCommands')
+
+// Default: flat format (modern stacks)
+const CommanderFactory = createCommanderFactory({ queryFormat: 'flat' })
 
 describe('CommanderFactory Tests', () => {
   let factory
@@ -91,31 +94,50 @@ describe('CommanderFactory Tests', () => {
     expect(factory.queryBuilder.track_scores).toBe(isTracked)
   })
 
-  test('run build query with isValidObjectQuery is not true', () => {
-    jest.spyOn(QueryBuilder.prototype, 'build')
+  test('build() with invalid query produces flat format (no body wrapper)', () => {
+    jest.spyOn(QueryBuilder.prototype, 'buildFlat')
     const commanderInstance = new CommanderFactory({ index: 'contents' })
     const customCommand = new CustomQueryCommand(null)
 
     commanderInstance.commands.push(customCommand)
     const query = commanderInstance.build()
 
-    expect(QueryBuilder.prototype.build).toHaveBeenCalled()
-    // When invalid query is passed, it should be set to empty object
+    expect(QueryBuilder.prototype.buildFlat).toHaveBeenCalled()
     expect(query).toEqual({
       index: 'contents',
-      body: {
-        query: {},
-        sort: [],
-        track_scores: false,
-        size: '100',
-        from: 0
-      }
+      query: {},
+      sort: [],
+      track_scores: false,
+      size: '100',
+      from: 0
     })
+    expect(query).not.toHaveProperty('body')
   })
 
-  test('run build query with isValidObjectQuery is true', () => {
-    jest.spyOn(QueryBuilder.prototype, 'build')
+  test('build() with valid query produces flat format (no body wrapper)', () => {
+    jest.spyOn(QueryBuilder.prototype, 'buildFlat')
     const commanderInstance = new CommanderFactory({ index: 'contents' })
+    const customCommand = new FilterCommand([{ term: 'test' }])
+
+    commanderInstance.commands.push(customCommand)
+    const query = commanderInstance.build()
+
+    expect(QueryBuilder.prototype.buildFlat).toHaveBeenCalled()
+    expect(query).toEqual({
+      index: 'contents',
+      query: { bool: { filter: [{ term: 'test' }] } },
+      sort: [],
+      track_scores: false,
+      size: '100',
+      from: 0
+    })
+    expect(query).not.toHaveProperty('body')
+  })
+
+  test('build() with queryFormat=body produces legacy body-wrapped format', () => {
+    const LegacyCommanderFactory = createCommanderFactory({ queryFormat: 'body' })
+    jest.spyOn(QueryBuilder.prototype, 'build')
+    const commanderInstance = new LegacyCommanderFactory({ index: 'contents' })
     const customCommand = new FilterCommand([{ term: 'test' }])
 
     commanderInstance.commands.push(customCommand)
@@ -134,37 +156,18 @@ describe('CommanderFactory Tests', () => {
     })
   })
 
-  test('should run build command', () => {
-    jest.spyOn(QueryBuilder.prototype, 'build')
+  test('should run build command and execute commands', () => {
     const mockCommand = { execute: jest.fn() }
     factory.commands.push(mockCommand)
     factory.build()
 
     expect(mockCommand.execute).toHaveBeenCalledWith(factory.queryBuilder)
-    expect(QueryBuilder.prototype.build).toHaveBeenCalled()
   })
 
-  test('buildFlat should return flat params without body wrapper', () => {
+  test('buildFlat should always return flat format regardless of queryFormat', () => {
+    const LegacyCommanderFactory = createCommanderFactory({ queryFormat: 'body' })
     jest.spyOn(QueryBuilder.prototype, 'buildFlat')
-    const commanderInstance = new CommanderFactory({ index: 'contents' })
-
-    const query = commanderInstance.buildFlat()
-
-    expect(QueryBuilder.prototype.buildFlat).toHaveBeenCalled()
-    expect(query).toEqual({
-      index: 'contents',
-      query: { bool: {} },
-      sort: [],
-      track_scores: false,
-      size: '100',
-      from: 0
-    })
-    expect(query).not.toHaveProperty('body')
-  })
-
-  test('buildFlat should apply commands and return flat format', () => {
-    jest.spyOn(QueryBuilder.prototype, 'buildFlat')
-    const commanderInstance = new CommanderFactory({ index: 'contents' })
+    const commanderInstance = new LegacyCommanderFactory({ index: 'contents' })
     const filterCommand = new FilterCommand([{ term: 'test' }])
 
     commanderInstance.commands.push(filterCommand)

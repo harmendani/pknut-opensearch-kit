@@ -67,35 +67,37 @@ client.search(finalQuery)
 
 ### 🆕 Modern Stack (OpenSearch 2.x+ / Elasticsearch 8.x+)
 
-For newer client versions the `body` wrapper was removed from search parameters. Use `createClient` and `buildFlat()`:
+For newer client versions the `body` wrapper was removed from search parameters.
+Use `createClient()` to get a `CommanderFactory` that **automatically** produces the right format — just call `build()` as normal:
 
 ```js
 const { createClient } = require('./src');
 
 // Choose your stack:
 //   'opensearch'       → @opensearch-project/opensearch (OpenSearch 2.x+ / 3.x+)
-//   'elasticsearch-v8' → @elastic/elasticsearch (ES 8.x+)
-//   'legacy'           → @elastic/elasticsearch 7.x (default, backward-compatible)
+//   'elasticsearch-v8' → @elastic/elasticsearch v8 (ES 8.x+)
 const { OpenSearch, CommanderFactory } = createClient({ stack: 'opensearch' });
 
 const client = new OpenSearch({ host: 'http://localhost:9200' });
 
+// build() automatically produces the right format for the configured stack
 const query = new CommanderFactory({ index: 'my_index' })
   .addFilter([{ term: { status: 'active' } }])
   .setSize(20)
-  .buildFlat(); // ← returns { index, query, sort, ... } without a body wrapper
+  .build(); // ← { index, query, sort, ... } — automatically flat, no body wrapper
 
 const results = await client.search(query);
 console.log(results.hits.hits);
 ```
 
-> **API differences between legacy and modern:**
+> **How `build()` works by stack:**
 >
-> | | Legacy (ES 7 / OS 1) | Modern (ES 8+ / OS 2+) |
+> | Stack | Client used | `build()` output |
 > |---|---|---|
-> | Build query | `commanderFactory.build()` | `commanderFactory.buildFlat()` |
-> | Params format | `{ index, body: { query, ... } }` | `{ index, query, ... }` |
-> | Response | `result.body.hits.hits` | `result.hits.hits` |
+> | `'opensearch'` (default) | `@opensearch-project/opensearch` 3.x | `{ index, query, ... }` |
+> | `'elasticsearch-v8'` | `@elastic/elasticsearch` 8.x | `{ index, query, ... }` |
+>
+> `buildFlat()` is also available as an explicit override that always returns the flat format regardless of stack.
 
 ### 📦 Classes Overview  
 
@@ -157,29 +159,29 @@ You can use the "add" methods to handling the clauses or even to use "set" metho
 
 #### The build methods  
 
-`build()` - Constructs the final query from the stored commands. Returns `{ index, body }` (legacy format for ES 7.x / OpenSearch 1.x).
+`build()` — Constructs the final query from the stored commands. The output format is **automatically determined** by the stack you configured in `createClient()`:
+- **Modern stacks** (`opensearch`, `elasticsearch-v8`): returns flat `{ index, query, sort, ... }` — no `body` wrapper
+- When used directly (without `createClient`): also defaults to flat format
 
-`buildFlat()` - Constructs the final query without a `body` wrapper. Returns `{ index, query, sort, ... }` (modern format for ES 8.x+ / OpenSearch 2.x+).
+`buildFlat()` — Always returns flat format `{ index, query, sort, ... }`, regardless of configured stack. Use as an explicit override.
 
-```
-const { CommanderFactory } = require('./src');
+```js
+const { createClient } = require('./src');
 
-// Legacy (ES 7.x / OpenSearch 1.x)
-const legacyQuery = commanderFactory.build();   // { index, body: {...} }
-
-// Modern (ES 8.x+ / OpenSearch 2.x+)
-const modernQuery = commanderFactory.buildFlat(); // { index, query, sort, ... }
+// Modern stack — build() is already smart
+const { CommanderFactory } = createClient({ stack: 'opensearch' });
+const query = commanderFactory.build(); // { index, query, sort, ... }
 ```
 
 #### createClient({ stack })
 
 Returns a `{ OpenSearch, CommanderFactory }` factory configured for the given stack.
+`CommanderFactory.build()` automatically produces the right format — no need to choose manually.
 
-| `stack` value | Client used | Query method |
+| `stack` value | Client used | `build()` format |
 |---|---|---|
-| `'legacy'` (default) | `@elastic/elasticsearch` 7.x | `build()` |
-| `'opensearch'` | `@opensearch-project/opensearch` 3.x | `buildFlat()` |
-| `'elasticsearch-v8'` | `@opensearch-project/opensearch` 3.x | `buildFlat()` |
+| `'opensearch'` (default) | `@opensearch-project/opensearch` 3.x | `{ index, query, ... }` |
+| `'elasticsearch-v8'` | `@elastic/elasticsearch` 8.x | `{ index, query, ... }` |
 
 ### ⚡ Built-In Queries  (on going)
 
@@ -243,4 +245,4 @@ The build methods construct the query with the updated properties while preservi
 
 Q: Which build method should I use?
 
-A: Use `build()` for legacy stacks (ES 7.x / OpenSearch 1.x) and `buildFlat()` for modern stacks (ES 8.x+ / OpenSearch 2.x+). The difference is whether the search parameters include a `body` wrapper or not.
+A: Just call `build()` — it automatically produces the right format for the stack you configured in `createClient()`. For modern stacks (`opensearch`, `elasticsearch-v8`), `build()` returns flat params `{ index, query, ... }`. If you need to explicitly force the flat format (e.g., without `createClient`), use `buildFlat()`.
